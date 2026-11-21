@@ -1,13 +1,15 @@
 // npm run shots: build, jalankan preview, ambil screenshot ke .screenshots/
 // Lebar 360/390/768/1440 x terang/gelap. Memakai Edge/Chrome terpasang lewat playwright-core.
-// Opsi: --no-build (lewati build), --motion (jangan emulasi reduced-motion), --path=/projects
+// Opsi: --no-build (lewati build), --motion (jangan emulasi reduced-motion), --path=/projects/rain-mandarin
 import { spawn, spawnSync } from 'node:child_process';
 import { mkdirSync, rmSync, existsSync } from 'node:fs';
 import { chromium } from 'playwright-core';
 
 const args = process.argv.slice(2);
 const flag = (n) => args.includes(`--${n}`);
-const pathArg = (args.find((a) => a.startsWith('--path=')) ?? '--path=/').slice(7);
+const pathOpt = args.find((a) => a.startsWith('--path='));
+// Bawaan: beranda dan studi kasus unggulan. --path=/x memotret satu halaman saja.
+const paths = pathOpt ? [pathOpt.slice(7)] : ['/', '/projects/rain-mandarin', '/404.html'];
 const PORT = 4399;
 const BASE = `http://localhost:${PORT}`;
 const OUT = '.screenshots';
@@ -56,7 +58,7 @@ try {
   const browser = await launch();
   let overflow = false;
 
-  for (const scheme of schemes) {
+  for (const pathArg of paths) for (const scheme of schemes) {
     for (const width of widths) {
       const ctx = await browser.newContext({
         viewport: { width, height: 900 },
@@ -93,6 +95,19 @@ try {
       await ctx.close();
       console.log(`ok ${name} ${width} ${scheme}`);
     }
+  }
+  // Tema dipaksa berlawanan dari sistem (pilihan pengguna di localStorage): 390 dan 1440 px.
+  for (const pathArg of paths) for (const scheme of schemes) for (const width of [390, 1440]) {
+    const pick = scheme === 'light' ? 'dark' : 'light';
+    const ctx = await browser.newContext({ viewport: { width, height: 900 }, colorScheme: scheme, reducedMotion: 'reduce', deviceScaleFactor: 1 });
+    await ctx.addInitScript((t) => localStorage.setItem('theme', t), pick);
+    const page = await ctx.newPage();
+    await page.goto(BASE + pathArg, { waitUntil: 'networkidle' });
+    await page.waitForTimeout(300);
+    const nm = pathArg === '/' ? 'home' : pathArg.replace(/W+/g, '-').replace(/^-|-$/g, '');
+    await page.screenshot({ path: `${OUT}/${nm}-${width}-sys${scheme}-pick${pick}.png`, fullPage: true });
+    await ctx.close();
+    console.log(`ok ${nm} ${width} sistem ${scheme}, pilihan ${pick}`);
   }
   await browser.close();
   console.log(overflow ? 'Selesai, ADA overflow horizontal.' : `Selesai. Tidak ada overflow horizontal. Hasil di ${OUT}/`);

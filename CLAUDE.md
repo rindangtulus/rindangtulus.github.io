@@ -3,7 +3,7 @@
 ## Tentang proyek
 Website portofolio pribadi di **https://rindangtulus.github.io/** (repo `rindangtulus.github.io`).
 Pemilik: Rindang Tulus Sumalyo, mahasiswa Informatika PENS (tahun ke-3), IT Project Manager & Scrum Master,
-Backend Developer di BudgEx, berbasis di Surabaya.
+Backend Developer & Scrum Master pada proyek BudgEx (Product-Based Learning kampus), berbasis di Surabaya.
 Tujuan: menunjukkan kepada perekrut bahwa saya bisa **memimpin dan membangun** proyek teknologi,
 lewat studi kasus yang jelas, bukan sekadar daftar teknologi.
 
@@ -23,7 +23,9 @@ tapi tampilannya dirombak total.
 ## Stack
 - Astro (output statis) + TypeScript
 - Tailwind CSS v4 (`@tailwindcss/vite`; token warna di CSS, tanpa tailwind.config)
-- Konten studi kasus: Astro Content Collections (Markdown/MDX) dengan skema yang divalidasi
+- Konten proyek: Astro Content Collection `projects` (`src/content.config.ts`, `src/content/projects/*.md`, glob loader,
+  skema zod). Studi kasus = isi Markdown dari entri dengan `caseStudy: true`.
+- View Transitions: `<ClientRouter />` di `Base.astro`
 - Font (di-host sendiri lewat @fontsource): Inter Tight (teks dan judul, variabel, bobot 500 untuk judul) dan Gloock
   (khusus frasa aksen miring; hanya bobot 400, italic sintetis diterima). Woff2 latin di-preload di `Base.astro` dan
   fallback memakai metrik (size-adjust/ascent-override) agar tidak ada pergeseran tata letak.
@@ -37,7 +39,7 @@ hierarki lewat ukuran (bukan dekorasi). Kertas blush terang (mode gelap: plum sa
 Catatan lisensi dan referensi: **Neue Montreal tidak dipakai (lisensi)**; Inter Tight adalah stand-in open-source (OFL).
 Referensi vibe: perryw-2023.webflow.io. Hanya untuk kesan; **jangan menyalin layout, teks, atau aset**-nya.
 
-Warna (token CSS, versi gelap ikut preferensi sistem; sakelar manual menyusul di langkah 4):
+Warna (token CSS, versi gelap ikut preferensi sistem; ikut sistem, sakelar manual di header):
 | Token | Terang | Gelap | Pemakaian |
 |---|---|---|---|
 | paper | #FBF5F2 | #1A0B13 | latar halaman |
@@ -59,7 +61,7 @@ Token turunan (juga di `src/styles/global.css`):
 
 Aturan: semua hex hidup di satu tempat (`src/styles/global.css`); komponen hanya memakai token. Pengecualian
 yang tak bisa memakai variabel: `<meta name="theme-color">` di `Base.astro` (harus sama dengan `--paper`) dan
-favicon. Kontras diperiksa: teks normal ≥ 4.5:1, teks besar dan komponen UI ≥ 3:1. Cincin fokus memakai
+`public/favicon.svg` (hex di dalam SVG; mengikuti prefers-color-scheme). Kontras diperiksa: teks normal ≥ 4.5:1, teks besar dan komponen UI ≥ 3:1. Cincin fokus memakai
 `outline-offset` ≥ 2px agar terlihat pada tombol berlatar aksen.
 
 Tipografi (token `--font-sans`, `--font-accent`; tanpa font mono):
@@ -76,6 +78,12 @@ Elemen khas:
   (baris 1 ink: "IT project manager and Scrum Master who also builds the backend."; baris 2 muted: "Based in Surabaya."),
   lalu status "Open to internships & collaborations" sebagai tautan teks ke Contact dengan titik aksen dan ikon panah.
   Tanpa tombol, tanpa foto di hero.
+- Sakelar tema (`ThemeToggle.astro`, `src/scripts/theme.ts`): dua keadaan, ikon berganti (bulan di tema terang, matahari di
+  gelap), `aria-label` dinamis ("Switch to dark theme" / "Switch to light theme"), tanpa `aria-pressed`. Pilihan eksplisit
+  SELALU disimpan di `localStorage["theme"]` (try/catch), juga bila sama dengan sistem; tanpa pilihan, tema mengikuti sistem.
+  Skrip inline di `<head>` menerapkan `data-theme` sebelum cat pertama; `page.ts` menyalin `data-theme` (dan kelas `js`) ke
+  dokumen baru di `astro:before-swap`. `<meta theme-color>` ikut berganti (nilai dibaca dari token `--paper`). Tombol
+  tersembunyi tanpa JavaScript. Tanpa transisi warna.
 - Header: nama "Rindang Tulus" dan peran kecil di kiri atas, tautan LinkedIn/GitHub di kanan atas (ikon saja di
   768-1023 px dengan `aria-label` dan area ketuk ≥ 44 px). Bar atas ikut scroll. Hanya **pil nav** di tengah atas
   (Work, About, Experience, Contact) yang menempel; item aktif = ink di atas latar `line` plus `aria-current`
@@ -125,26 +133,63 @@ Elemen khas:
 
 ## Struktur halaman
 - `/`: beranda (Work, About, Experience + Credentials, Now, Contact; semua proyek tampil di sini)
-- `/projects/[slug]`: studi kasus
-- `/404`
+- `/projects/[slug]`: studi kasus. HANYA proyek dengan `caseStudy: true` yang punya halaman (sekarang `rain-mandarin`).
+  Proyek lain tampil sebagai baris non-link di beranda (tanpa panah dan tanpa hover). Jangan membuat halaman tipis.
+
+## Koleksi `projects` (skema)
+Frontmatter per entri: `title`, `subtitle`, `code` (`P-01`…`P-06`), `order`, `role`, `stack[]`, `summary` (satu kalimat
+hasil, kualitatif), `version?` (satu sumber untuk blok Now dan studi kasus), `year?`, `links.demo?`, `cover` (`image()`) dan
+`coverAlt`, `gallery[{ image, alt, caption }]`, `caseStudy` (boolean, bawaan false). `alt`, `caption`, `coverAlt` tidak boleh
+kosong (build gagal). `caseStudy: true` wajib punya galeri dan isi Markdown. Isi studi kasus memakai heading Context, Problem,
+My role, Process, Outcome, What I learned, Technical highlights. Teks Mandarin dalam prosa dibungkus
+`<span lang="zh-Hant">`.
+
+Perpindahan halaman: judul proyek memakai `transition:name="title-{slug}"` (baris ↔ header studi kasus); pil nav
+`transition:persist="site-pill"` (id eksplisit wajib, id otomatis berubah per halaman). Semua init skrip (`reveal`, `scrollspy`,
+`menu`, `copy`) lewat `src/scripts/page.ts` pada `astro:page-load` dan dibersihkan di `astro:before-swap` (tiap init
+mengembalikan fungsi cleanup; listener memakai AbortController).
+- `/404`: `src/pages/404.astro` (headline dengan frasa aksen, satu tautan ke beranda, `noindex`, tanpa canonical); terbit sebagai `dist/404.html`.
+
+## SEO, OG, favicon
+- `Base.astro` menerima `title`, `description`, `image`, `imageAlt`, `type`, `noindex`: canonical (dari `site` di astro.config),
+  Open Graph, Twitter card, `robots` noindex bila diminta. Beranda memuat JSON-LD Person (name, jobTitle, url, sameAs
+  LinkedIn dan GitHub; tanpa email, tanpa `worksFor`). Sitemap lewat `@astrojs/sitemap` (404 dikecualikan); `public/robots.txt`.
+- Gambar OG 1200×630: `npm run og` (`scripts/og.mjs`, playwright-core) membuat `public/og.png` dan `public/og/<slug>.png`
+  per studi kasus; og:image studi kasus menunjuk ke OG-nya sendiri. Warna dibaca dari blok `:root` di `global.css`; bila token
+  tidak ada, skrip berhenti dengan error (tanpa hex cadangan). Skrip juga memeriksa ukuran dan teks tidak terpotong.
+- Favicon: monogram RT (`public/favicon.svg`, wine terang / rose gelap), `favicon-32.png`, `apple-touch-icon.png` (180 px) lewat
+  `npm run icons`. Bintang jatuh lama dibuang (bukan logo pemilik, berisiko hak cipta). Tanpa `favicon.ico`.
 
 ## Konten (dari versi lama, perlu diperiksa pemilik)
 Experience:
-- 2026–sekarang · Backend Developer & Scrum Master · BudgEx — PT Sinergi Dimensi Informatika (Sindika)
-  (deskripsi lama tersalin dari E-Code → TODO tulis ulang)
+- 2026–sekarang · Backend Developer & Scrum Master · BudgEx — Product-Based Learning (PdBL) project, PENS in
+  collaboration with PT Sinergi Dimensi Informatika (Sindika). BudgEx adalah NAMA PROYEK PdBL kampus, BUKAN perusahaan,
+  dan ini BUKAN pekerjaan atau magang di Sindika (jangan menyiratkan karyawan Sindika di hero, About, Now, Experience,
+  data, meta, atau JSON-LD). Periode "2026 to now" belum dikonfirmasi pemilik (jangan diubah dulu). Tampil sebagai butir di daftar Experience (`points` di
+  `src/data/experience.ts`): aturan pengajuan anggaran (satu RAB aktif, pengajuan baru saat review, kedaluwarsa otomatis
+  setelah disetujui), validasi OPEX dan metadata review CAPEX dengan unit test, endpoint laporan (variance anggaran,
+  ringkasan direksi, drill-down kepala departemen) dan sistem peringatan pemakaian anggaran, serta dashboard realisasi
+  yang dipercepat (cache in-memory, kurangi over-fetching), dan "As Scrum Master, supported each individual team member."
+  Tanpa angka dampak.
+  Deskripsi prosa E-Code/Dirgantara/MC di data tidak ditampilkan (keputusan pemilik).
 - 2026–sekarang · Project Manager · E-Code — HIMIT
 - 2025–sekarang · Development Division Member · UKM Dirgantara — PENS
 - 2025 · Master of Ceremony · PKKMB x Technogear 2025 — PENS
 
 Projects:
 - RuangKita — Campus Room Reservation System (ASP.NET Core, Laravel, React, PostgreSQL)
-- BudgEx — Budget Approval Flow (backend, PostgreSQL, MySQL). Nama "BudgEx" dipakai untuk proyek dan perusahaan.
+- BudgEx — Budget Approval Flow (`caseStudy: false`, baris non-link). Ringkasan: aplikasi Android yang membawa anggaran
+  perusahaan dari perencanaan, persetujuan, catatan pengeluaran, sampai laporan, dalam satu tempat. Stack: PostgreSQL, MySQL.
+  TODO(rindang): framework dan bahasa backend (jangan ditebak). Jangan tautkan repo BudgEx dan jangan pajang nomor PR.
+  "BudgEx" hanya nama proyek (koreksi: bukan nama perusahaan).
 - DIPENS — Seminar Platform (UX design: Figma, Canva)
 - Sistem Informasi Pegawai Rumah Sakit (Laravel, Blade)
 - MyMovies — Movie List App (Flutter)
-- **Belajar Mandarin (學華語)** — proyek unggulan (tampil pertama). Detail di bagian di bawah.
+- **Rain Mandarin** (subjudul "學華語 · Belajar Mandarin Taiwan", slug `rain-mandarin`) — proyek unggulan (tampil pertama).
+  Nama aplikasi di situs demo (title dan sidebar) adalah "Rain Mandarin"; screenshot lama masih menampilkan sidebar
+  "學華語 Belajar Mandarin Taiwan". Detail di bagian di bawah.
 
-### Studi kasus unggulan: Belajar Mandarin (學華語)
+### Studi kasus unggulan: Rain Mandarin (學華語 · Belajar Mandarin Taiwan)
 - Context: mahasiswa pemula yang ikut kelas Mandarin Taiwan (aksara tradisional). Aplikasi umum tidak
   mengikuti materi kelas, banyak yang memakai aksara sederhana, dan tidak berbahasa Indonesia.
 - Problem: butuh satu tempat untuk menyimpan kosakata dari kelas, mengulang dengan jadwal yang tepat,
@@ -161,9 +206,15 @@ Projects:
   mode pinyin untuk pemula, aksesibilitas dan reduced-motion.
 - What I learned: desain data local-first, menjaga backup lama tetap terbaca, menulis prompt/brief yang jelas
   untuk AI, dan memecah produk menjadi rilis kecil.
-- Gambar: screenshot dari `docs/screenshots/` repo Belajar Mandarin (berisi data contoh fiktif, aman),
-  disalin ke `src/assets/projects/belajar-mandarin/`.
-- Tautan: demo Vercel kalau pemilik memberikan URL-nya. Repo private, jadi jangan tautkan ke GitHub.
+- Gambar: screenshot dari `docs/screenshots/` repo aplikasi (berisi data contoh fiktif, aman), disalin ke
+  `src/assets/projects/belajar-mandarin/` (nama folder tidak diubah). Cover = `laptop-beranda`; galeri = 8 gambar lain
+  (6 laptop, 2 HP). Tile HP rasio 9/13, lebar maks 280 px, `object-top`; alt text mendeskripsikan bagian yang tampil di tile.
+- Tautan: demo Vercel https://belajar-mandarin-alpha.vercel.app/ ("Live demo", tab baru, `rel="noopener"`). Repo private,
+  jadi jangan tautkan ke GitHub.
+- Tes ditulis "1,000+ Vitest tests" di situs (tetap benar saat tes bertambah). Terkonfirmasi pemilik: `npx vitest run`
+  pada 2026-11-21 = 1.046 tes lulus di 44 berkas. Versi hanya dari field `version`.
+- Sudut pandang teks studi kasus: ORANG PERTAMA ("I was a beginner student in a Taiwanese Mandarin class…"). Pemilik
+  memang pelajar kelas Mandarin Taiwan itu.
 
 Angka dampak lama ("efisiensi naik 40%", "50% lebih cepat", dll.) hanya dipakai setelah dikonfirmasi pemilik.
 
@@ -182,9 +233,12 @@ Kontak: rindangtulus@gmail.com · LinkedIn `rindangtulus` · GitHub `rindangtulu
 1b. [x] Redesain tema bersih "Claret Folio": hero dengan frasa aksen, pil nav, daftar proyek berbasis baris,
        beranda satu halaman (Work, About, Experience + Credentials, Now, Contact). Isi konten awal sudah terpasang;
        teks yang belum terkonfirmasi ditandai TODO(rindang)
-2. [ ] Beranda: poles dan lengkapi konten (deskripsi BudgEx, apa yang sedang dipelajari di Now, tahun proyek)
-3. [ ] Projects + Content Collections + halaman studi kasus (Belajar Mandarin pertama, galeri screenshot) + View Transitions
-4. [ ] SEO (meta, Open Graph, sitemap), favicon, 404, sakelar tema
+2. [x] Beranda lengkap (dibangun di 1b; data BudgEx diperbarui di langkah 3). TODO(rindang) tersisa: tanggung jawab Scrum
+       Master (selesai), apa yang sedang dipelajari di Now, tahun proyek, framework/bahasa backend BudgEx;
+       periode BudgEx dan blok Now menunggu konfirmasi pemilik
+3. [x] Content Collection `projects` + halaman studi kasus (Rain Mandarin pertama, galeri screenshot) + View Transitions
+       + data BudgEx baru + `npm run check:links`
+4. [x] SEO (meta, Open Graph, sitemap, JSON-LD), OG per studi kasus, favicon RT, 404, sakelar tema
 5. [ ] Audit akhir: aksesibilitas, Lighthouse, tampilan HP, isi konten
 
 Tandai item dengan [x] setiap kali selesai.
@@ -194,4 +248,7 @@ Tandai item dengan [x] setiap kali selesai.
 - `npm run build` — build statis ke `dist/`
 - `npm run preview` — pratinjau hasil build
 - `npm run check` — pemeriksaan tipe Astro/TypeScript (`astro check`)
-- `npm run shots` — screenshot 360/390/768/1440 px, terang dan gelap, ke `.screenshots/`
+- `npm run check:links` — periksa `dist/`: tautan/aset internal, canonical, og:image, sitemap, robots, 404 (setelah build)
+- `npm run og` — buat ulang gambar OG (`public/og.png`, `public/og/<slug>.png`)
+- `npm run icons` — render PNG favicon (32 px) dan apple-touch-icon (180 px) dari `public/favicon.svg`
+- `npm run shots` — screenshot beranda dan studi kasus di 360/390/768/1440 px, terang dan gelap, ke `.screenshots/`

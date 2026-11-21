@@ -2,6 +2,7 @@
 import { sections } from '../data/nav';
 import { site } from '../data/site';
 import Icon from './Icon.astro';
+import ThemeToggle from './ThemeToggle.astro';
 
 const social = [
   { label: 'LinkedIn', icon: 'linkedin', href: site.linkedin },
@@ -36,12 +37,14 @@ const social = [
           </li>
         ))
       }
+      <li><ThemeToggle /></li>
     </ul>
   </div>
 </header>
 
 <!-- Pil melayang di tengah atas (>= 768 px) -->
 <nav
+  transition:persist="site-pill"
   class="fixed left-1/2 top-3 z-40 hidden -translate-x-1/2 rounded-full border border-line bg-surface/85 p-1 shadow-pill backdrop-blur-md md:block"
   aria-label="Sections"
 >
@@ -104,6 +107,7 @@ const social = [
           </li>
         ))
       }
+      <li><ThemeToggle class="-ml-2" /></li>
     </ul>
   </nav>
 </details>

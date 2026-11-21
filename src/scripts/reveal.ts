@@ -1,6 +1,7 @@
 // Reveal-on-scroll: elemen [data-reveal] muncul sekali saja saat masuk viewport.
 // Container [data-reveal-group] memberi stagger otomatis ke anak langsungnya.
-export function initReveal() {
+// Mengembalikan fungsi cleanup (dipanggil sebelum navigasi ClientRouter berikutnya).
+export function initReveal(): () => void {
   document.querySelectorAll<HTMLElement>('[data-reveal-group]').forEach((group) => {
     Array.from(group.children).forEach((child, i) => {
       const el = child as HTMLElement;
@@ -9,11 +10,11 @@ export function initReveal() {
     });
   });
 
-  const targets = document.querySelectorAll<HTMLElement>('[data-reveal], .grow');
+  const targets = document.querySelectorAll<HTMLElement>('[data-reveal]');
   const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   if (reduced || !('IntersectionObserver' in window)) {
     targets.forEach((el) => el.classList.add('is-visible'));
-    return;
+    return () => {};
   }
 
   const io = new IntersectionObserver(
@@ -28,4 +29,5 @@ export function initReveal() {
     { threshold: 0.12, rootMargin: '0px 0px -6% 0px' },
   );
   targets.forEach((el) => io.observe(el));
+  return () => io.disconnect();
 }

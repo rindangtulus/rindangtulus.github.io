@@ -1,0 +1,20 @@
+---
+import Base from '../layouts/Base.astro';
+import Icon from '../components/Icon.astro';
+---
+
+<Base title="Page not found | Rindang Tulus" description="This page does not exist." noindex>
+  <section id="top" class="pb-24 pt-32 md:pt-44 lg:pb-32 lg:pt-52" aria-labelledby="nf-title">
+    <div class="container-page">
+      <p class="label">404</p>
+      <h1 id="nf-title" class="title-hero mt-4 max-w-[11em]">
+        Page <em>not found.</em>
+      </h1>
+      <p class="mt-10 md:ml-[25%] lg:ml-[50%]">
+        <a href="/" class="link inline-flex min-h-11 items-center gap-2 text-base font-medium">
+          <Icon name="arrow-left" class="size-4" /> Back to home
+        </a>
+      </p>
+    </div>
+  </section>
+</Base>

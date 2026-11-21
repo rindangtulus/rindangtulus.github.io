@@ -1,5 +1,6 @@
 ---
 import '../styles/global.css';
+import { ClientRouter } from 'astro:transitions';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import { site } from '../data/site';
@@ -10,11 +11,24 @@ import accentUrl from '@fontsource/gloock/files/gloock-latin-400-normal.woff2?ur
 interface Props {
   title?: string;
   description?: string;
+  /** Path atau URL gambar OG (1200x630). Bawaan: /og.png */
+  image?: string;
+  imageAlt?: string;
+  type?: 'website' | 'article';
+  noindex?: boolean;
 }
 const {
   title = `${site.name}: IT Project Manager & Backend Developer`,
   description = site.positioning,
+  image = '/og.png',
+  imageAlt = `${site.name}: I lead small teams to ship software that works.`,
+  type = 'website',
+  noindex = false,
 } = Astro.props;
+
+// Canonical dan URL absolut memakai `site` dari astro.config (https://rindangtulus.github.io).
+const canonical = new URL(Astro.url.pathname, Astro.site).href;
+const ogImage = new URL(image, Astro.site).href;
 ---
 
 <!doctype html>
@@ -28,11 +42,43 @@ const {
     <meta name="theme-color" content="#1A0B13" media="(prefers-color-scheme: dark)" />
     <link rel="preload" href={sansUrl} as="font" type="font/woff2" crossorigin />
     <link rel="preload" href={accentUrl} as="font" type="font/woff2" crossorigin />
+
     <title>{title}</title>
     <meta name="description" content={description} />
-    <link rel="icon" type="image/png" href="/favicon.png" />
+    {!noindex && <link rel="canonical" href={canonical} />}
+    {noindex && <meta name="robots" content="noindex" />}
+
+    <meta property="og:site_name" content={site.name} />
+    <meta property="og:type" content={type} />
+    <meta property="og:locale" content="en_US" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    {!noindex && <meta property="og:url" content={canonical} />}
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content={imageAlt} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImage} />
+    <meta name="twitter:image:alt" content={imageAlt} />
+
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <slot name="head" />
+    <ClientRouter />
     <script is:inline>
-      document.documentElement.classList.add('js');
+      // Sebelum cat pertama: kelas js + tema pilihan pengguna (bila ada). Tanpa pilihan, CSS mengikuti sistem.
+      (function () {
+        var root = document.documentElement;
+        root.classList.add('js');
+        try {
+          var t = localStorage.getItem('theme');
+          if (t === 'light' || t === 'dark') root.dataset.theme = t;
+        } catch (e) {}
+      })();
     </script>
   </head>
   <body>
@@ -48,12 +94,8 @@ const {
     </main>
     <Footer />
     <script>
-      import { initReveal } from '../scripts/reveal';
-      import { initScrollSpy } from '../scripts/scrollspy';
-      import { initMenu } from '../scripts/menu';
-      initReveal();
-      initScrollSpy();
-      initMenu();
+      import { setupPages } from '../scripts/page';
+      setupPages();
     </script>
   </body>
 </html>

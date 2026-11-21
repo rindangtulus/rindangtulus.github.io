@@ -5,28 +5,40 @@ import Hero from '../components/Hero.astro';
 import ProjectRow from '../components/ProjectRow.astro';
 import ListRows from '../components/ListRows.astro';
 import Icon from '../components/Icon.astro';
-import portrait from '../assets/profile/rindang.jpg';
-import { projects } from '../data/projects';
+import portrait from '../assets/profile/rindang-web.jpg'; // salinan terkompres tanpa EXIF/XMP/GPS
+import { getCollection } from 'astro:content';
 import { experience } from '../data/experience';
 import { credentials } from '../data/credentials';
 import { skills } from '../data/skills';
-import { now } from '../data/now';
+import { getNow } from '../data/now';
 import { site } from '../data/site';
 
+const projects = (await getCollection('projects')).sort((a, b) => a.data.order - b.data.order);
+const now = await getNow();
+// Data terstruktur Person: hanya fakta di CLAUDE.md; tanpa email dan tanpa worksFor.
+const personLd = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'Person',
+  name: site.name,
+  jobTitle: 'IT Project Manager',
+  url: site.url,
+  sameAs: [site.linkedin, site.github],
+});
 const period = (e: { start: number; end: number | null }) =>
   e.end === null ? `${e.start} to now` : e.end === e.start ? `${e.start}` : `${e.start} to ${e.end}`;
-const experienceItems = experience.map((e) => ({ when: period(e), title: e.role, sub: e.org }));
+const experienceItems = experience.map((e) => ({ when: period(e), title: e.role, sub: e.org, points: e.points }));
 const credentialItems = credentials.map((c) => ({ when: String(c.year), title: c.title, sub: c.issuer }));
 ---
 
 <Base>
+  <script type="application/ld+json" slot="head" set:html={personLd} />
   <Hero />
 
   <section id="work" class="py-20 md:py-28" aria-labelledby="work-title">
     <div class="container-page">
       <div data-reveal>
         <h2 id="work-title" class="title-section">Selected work</h2>
-        <p class="mt-4 max-w-[48ch] text-lg text-muted">Projects I have led, designed or built, with the featured case study first.</p>
+        <p class="mt-4 max-w-[48ch] text-lg text-muted">Projects I have led, designed or built. Open the first one for the full case study.</p>
       </div>
       <div class="mt-12 border-t border-line md:mt-16" data-reveal>
         {projects.map((p) => <ProjectRow project={p} />)}
@@ -118,7 +130,3 @@ const credentialItems = credentials.map((c) => ({ when: String(c.year), title: c
   </section>
 </Base>
 
-<script>
-  import { initCopy } from '../scripts/copy';
-  initCopy();
-</script>
