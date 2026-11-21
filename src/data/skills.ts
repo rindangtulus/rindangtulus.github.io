@@ -6,7 +6,7 @@ export const skills = [
   },
   {
     group: 'Engineering',
-    items: ['ASP.NET Core', 'Laravel', 'React', 'PostgreSQL', 'MySQL', 'Flutter', 'Python', 'HTML & CSS', 'Git'],
+    items: ['ASP.NET Core', 'Laravel', 'React', 'PostgreSQL', 'MySQL', 'Flutter', 'Python', 'HTML and CSS', 'Git'],
   },
   { group: 'Design', items: ['Figma', 'Canva'] },
 ] as const;

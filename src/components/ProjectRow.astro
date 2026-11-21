@@ -33,7 +33,12 @@ const interactive = 'transition-colors duration-300 hover:border-accent focus-vi
   <span class="label order-last col-span-1 col-start-1 row-start-2 md:order-none md:col-start-auto md:row-start-auto">
     <span class="block">{role}</span><span class="block">{stackText}</span>
   </span>
-  <span class="col-start-2 row-span-2 row-start-1 flex size-11 items-center justify-center text-ink md:col-start-auto md:row-span-1 md:row-start-auto">
+  <span
+    class:list={[
+      'col-start-2 row-span-2 row-start-1 flex size-[min(2.75rem,max(44px,12vw))] items-center justify-center text-ink md:col-start-auto md:row-span-1 md:row-start-auto md:size-11',
+      !caseStudy && 'max-md:hidden',
+    ]}
+  >
     {
       caseStudy && (
         <Icon

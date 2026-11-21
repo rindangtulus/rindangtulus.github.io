@@ -1,15 +1,14 @@
 import { getEntry } from 'astro:content';
 
-// Blok "Now": HANYA fakta yang sudah ada di CLAUDE.md / briefing.
-// TODO(rindang): tambahkan apa yang sedang dipelajari saat ini (belum ada di sumber, jadi tidak ditampilkan).
+// Blok "Now": HANYA fakta dari briefing pemilik. Struktur tetap string[] (awalan teks biasa).
 export async function getNow(): Promise<string[]> {
+  // Versi Rain Mandarin berasal dari satu sumber: frontmatter rain-mandarin.md (sama dengan halaman proyek).
   const app = await getEntry('projects', 'rain-mandarin');
-  // Versi berasal dari satu field (frontmatter rain-mandarin.md), sama dengan studi kasus.
-  const version = app?.data.version ? ` (currently v${app.data.version})` : '';
+  const version = app?.data.version;
+  if (!version) throw new Error('now.ts: rain-mandarin.md harus punya field "version".');
   return [
-    'Backend Developer and Scrum Master on BudgEx, a Product-Based Learning (PdBL) project at PENS with PT Sinergi Dimensi Informatika (Sindika).',
-    'Project Manager at E-Code, leading campus technology projects.',
-    `Building Rain Mandarin, an offline-capable Mandarin learning app${version}.`,
-    'Third-year Informatics student at PENS.',
+    'Working on: backend and Scrum Master work for BudgEx, a Product-Based Learning (PdBL) project at PENS with Sindika.',
+    `Building: Rain Mandarin, a Traditional-character Mandarin PWA, currently at v${version}.`,
+    'Studying: third year of Informatics at PENS.',
   ];
 }

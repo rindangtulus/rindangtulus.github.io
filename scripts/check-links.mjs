@@ -3,6 +3,7 @@
 // - canonical, og:image, twitter:image ada dan canonical cocok dengan halaman;
 // - sitemap: setiap <loc> punya halaman di dist, 404 tidak ada di sitemap, sitemap-index terbaca;
 // - robots.txt merujuk sitemap yang ada; dist/404.html terbit dan noindex;
+// - kebersihan: tanpa TODO/lorem/placeholder/localhost/console.log/href kosong di HTML dan skrip kita (vendor Astro dikecualikan);
 // - setiap studi kasus punya OG sendiri (public/og/<slug>.png) yang ditunjuk og:image halamannya.
 // Gagal (exit 1) bila ada masalah.
 import { readdirSync, readFileSync, existsSync, statSync } from 'node:fs';
@@ -116,6 +117,18 @@ for (const u of sitemapUrls) {
 for (const url of htmlOf.keys()) {
   if (url === '/404.html' || url === '/404/') continue;
   if (!sitemapUrls.includes(SITE + url)) problems.push(`sitemap: ${SITE + url} tidak tercantum`);
+}
+
+// 6) Kebersihan hasil build: tidak boleh ada sisa pengembangan di HTML atau skrip kita.
+// Chunk vendor Astro (ClientRouter) memuat console.log di jalur error miliknya sendiri dan dikecualikan.
+const dirty = [/TODO/i, /lorem/i, /placeholder/i, /localhost/i, /console\.log/, /href=""/, /href="#"/];
+const jsFiles = walk(DIST).filter((f) => extname(f) === ".js" && !/ClientRouter/.test(f));
+for (const [url, html] of htmlOf) {
+  for (const re of dirty) if (re.test(html)) problems.push(`${url}: ditemukan ${re} di HTML`);
+}
+for (const f of jsFiles) {
+  const code = readFileSync(f, "utf8");
+  for (const re of [/TODO/i, /localhost/i, /console\.log/]) if (re.test(code)) problems.push(`${f}: ditemukan ${re}`);
 }
 
 console.log(`${pages.length} halaman, ${checked} pemeriksaan tautan/meta, ${sitemapUrls.length} URL sitemap.`);

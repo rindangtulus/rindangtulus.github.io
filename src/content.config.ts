@@ -20,8 +20,9 @@ const projects = defineCollection({
         version: z.string().trim().min(1).optional(), // satu sumber untuk blok Now dan studi kasus
         year: z.number().int().optional(),
         links: z.object({ demo: z.url().optional() }).default({}),
-        cover: image(),
-        coverAlt: text('coverAlt'),
+        // Cover hanya dipakai halaman studi kasus: opsional untuk caseStudy: false, wajib untuk caseStudy: true.
+        cover: image().optional(),
+        coverAlt: text('coverAlt').optional(),
         gallery: z
           .array(z.object({ image: image(), alt: text('gallery alt'), caption: text('gallery caption') }))
           .default([]),
@@ -30,6 +31,10 @@ const projects = defineCollection({
       .refine((d) => !d.caseStudy || d.gallery.length > 0, {
         message: 'a case study needs at least one gallery image',
         path: ['gallery'],
+      })
+      .refine((d) => !d.caseStudy || (d.cover && d.coverAlt), {
+        message: 'a case study needs cover and coverAlt',
+        path: ['cover'],
       }),
 });
 

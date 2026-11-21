@@ -11,7 +11,21 @@ Versi lama (HTML statis tunggal) disimpan di tag git `v1-lama`. Isinya boleh dip
 tapi tampilannya dirombak total.
 
 ## Aturan umum
-- Bahasa konten: **Inggris** (konsisten di seluruh situs). Teks dalam kode/komentar boleh bahasa Indonesia.
+- Bahasa konten: **Inggris Amerika** (practice, modeled, color, organization, dll.; konsisten di seluruh situs).
+  Teks dalam kode/komentar boleh bahasa Indonesia. Periode di Experience ditulis "2026 – Present" / "2025 – Present"
+  (en dash, "Present"; data sumber tetap `start`/`end`).
+- Konsistensi teks (hasil audit):
+  - Label peran (header, meta, baris proyek, Experience, JSON-LD) memakai Title Case, mis. "Backend Developer & Scrum Master".
+    Kalimat hero dan prosa memakai huruf biasa. Alt gambar OG mengutip teks yang benar-benar tampil di gambar (`scripts/og.mjs`).
+  - "&" hanya di label peran, nama baku, dan baris status "Open to internships & collaborations". Prosa, judul, dan item daftar
+    memakai "and" (mis. "Numbers and Time", "HTML and CSS"). Judul default beranda memuat label peran, jadi tetap memakai "&".
+  - Title halaman memakai pola "Halaman | Rindang Tulus"; studi kasus "Judul case study | Rindang Tulus" (tanpa titik dua).
+    Beranda dan 404 berformat sendiri.
+  - Ejaan Inggris Amerika; periode ditulis "2026 – Present" (en dash).
+  - Seluruh teks tampil berbahasa Inggris; nama resmi organisasi dan nama baku dibiarkan apa adanya (mis. BEM PENS, Sinergi97,
+    "Sistem Informasi Pegawai Rumah Sakit", "學華語 · Belajar Mandarin Taiwan"). Judul kredensial ditulis dalam bahasa Inggris,
+    mis. "Committee Member, PKKMB x Technogear 2025".
+  - Sengaja tidak diubah: em dash pada baris organisasi BudgEx, nama tautan beranda, dan `overflow-wrap`.
 - Jangan mengarang fakta, angka dampak, nama perusahaan, atau tanggal. Kalau data belum ada, tulis placeholder
   yang jelas `TODO(rindang): ...` dan sebutkan di ringkasan.
 - Sebelum fitur besar: jelaskan rencana dan file yang akan diubah, lalu tunggu persetujuan.
@@ -29,7 +43,14 @@ tapi tampilannya dirombak total.
 - Font (di-host sendiri lewat @fontsource): Inter Tight (teks dan judul, variabel, bobot 500 untuk judul) dan Gloock
   (khusus frasa aksen miring; hanya bobot 400, italic sintetis diterima). Woff2 latin di-preload di `Base.astro` dan
   fallback memakai metrik (size-adjust/ascent-override) agar tidak ada pergeseran tata letak.
-- Deploy: GitHub Pages lewat GitHub Actions (Settings → Pages → Source: GitHub Actions)
+- Deploy: GitHub Pages lewat GitHub Actions (Settings → Pages → Source: GitHub Actions). Workflow `.github/workflows/deploy.yml`:
+  `pull_request` ke main = job `verify` saja (check, build, check:links; tanpa deploy); push ke main / workflow_dispatch = build
+  lalu deploy. Izin minimal (`contents: read`; `pages: write` dan `id-token: write` hanya di job deploy), concurrency deploy tidak
+  membatalkan yang berjalan. Aksi: checkout@v7, setup-node@v7, upload-pages-artifact@v5, deploy-pages@v5 (tanpa configure-pages: `site` statis, tanpa
+  base, dan job build hanya punya `contents: read`, jadi API Pages bisa memberi 403). Job build/deploy tidak bisa dites lewat PR;
+  hanya job `verify` yang berjalan di PR.
+- Node: `.nvmrc` = 22; `engines.node` >= 22.22.1 (syarat `sitemap`). Upgrade `astro` ke >= 7.4.7 (perbaikan `npm audit`) butuh
+  Node >= 22.23.4. README.md ada untuk repo publik (tanpa LICENSE; catatan hak cipta desain dan konten ada di README).
 
 ## Tema: "Claret Folio"
 Tampilan bersih dan simpel ala portofolio desainer modern: sans grotesk besar dan rapat, ruang kosong lega,
@@ -95,7 +116,11 @@ Elemen khas:
   panah bergeser 4 px dan garis bawah baris berubah ke accent; judul tidak ikut bergeser. Screenshot hanya di halaman
   studi kasus.
 - Experience dan Credentials = daftar bersih (periode, peran/judul, organisasi). Tanpa Gantt, tanpa penomoran bagian.
-- Blok **Now**: HANYA fakta dari CLAUDE.md/briefing. Yang belum terkonfirmasi ditandai `TODO(rindang)`.
+- Blok **Now** (`src/data/now.ts`, `string[]` dengan awalan teks biasa): tiga butir dari briefing pemilik. "Working on: backend and
+  Scrum Master work for BudgEx, a Product-Based Learning (PdBL) project at PENS with Sindika." / "Building: Rain Mandarin, a
+  Traditional-character Mandarin PWA, currently at v{version}." / "Studying: third year of Informatics at PENS." Versi dibaca dari
+  `getEntry('projects', 'rain-mandarin').data.version` (satu sumber dengan halaman proyek); build gagal bila `version` hilang.
+  Jangan menambah fakta lain tanpa konfirmasi pemilik.
 - Studi kasus: Context → Problem → My role → Process → Outcome → What I learned, plus galeri screenshot.
 
 ## Standar kualitas visual (wajib di setiap langkah)
@@ -103,6 +128,16 @@ Elemen khas:
   grid konsisten, satu aksen warna yang dipakai hemat, tanpa kartu berbingkai tebal.
 - Tidak ada lorem ipsum, gambar placeholder abu-abu, atau tombol yang tidak berfungsi di hasil akhir.
 - Gambar: format modern (Astro `<Image />`), ukuran tepat, alt text bermakna, tanpa pergeseran tata letak.
+
+## Aksesibilitas (hasil audit langkah 5)
+- Skip link "Skip to content" di `Base.astro`. Satu `h1` per halaman, landmark header/nav/main/footer; dua `nav` bernama berbeda
+  ("Sections" dan "Sections, mobile").
+- Menu HP: saat panel terbuka, `body > a[href="#main"]`, `body > header`, `main`, dan `footer` diberi `inert`; dilepas saat menutup,
+  di cleanup `menu.ts`, dan di `astro:before-swap`. Escape menutup dan mengembalikan fokus ke tombol Menu.
+- Zoom: lulus di 200% dan 400% (viewport 320 px) dan pada ukuran font bawaan browser 200%/400% tanpa scroll horizontal. `body` memakai
+  `overflow-wrap: anywhere`; header HP menyisakan ruang `min(8.5rem,70vw)` untuk tombol Menu. Batas yang diketahui: pada font
+  bawaan 400% di lebar 390 px, tombol Menu menempel dan dapat menimpa nama (tidak ada scroll horizontal).
+- `forced-colors: active`: item pil/menu aktif diberi outline + garis bawah, titik status memakai `LinkText`, sakelar tema diberi batas.
 
 ## Responsif
 - Diuji di lebar 360, 390, 768, 1024, 1440, dan 1920 px. Tidak boleh ada scroll horizontal.
@@ -139,7 +174,8 @@ Elemen khas:
 ## Koleksi `projects` (skema)
 Frontmatter per entri: `title`, `subtitle`, `code` (`P-01`…`P-06`), `order`, `role`, `stack[]`, `summary` (satu kalimat
 hasil, kualitatif), `version?` (satu sumber untuk blok Now dan studi kasus), `year?`, `links.demo?`, `cover` (`image()`) dan
-`coverAlt`, `gallery[{ image, alt, caption }]`, `caseStudy` (boolean, bawaan false). `alt`, `caption`, `coverAlt` tidak boleh
+`coverAlt` (opsional untuk `caseStudy: false`, wajib untuk `caseStudy: true`; PNG cover proyek non-studi-kasus tetap di
+`src/assets/projects/` tetapi tidak dirujuk, jadi tidak terbit ke `dist/`), `gallery[{ image, alt, caption }]`, `caseStudy` (boolean, bawaan false). `alt`, `caption`, `coverAlt` tidak boleh
 kosong (build gagal). `caseStudy: true` wajib punya galeri dan isi Markdown. Isi studi kasus memakai heading Context, Problem,
 My role, Process, Outcome, What I learned, Technical highlights. Teks Mandarin dalam prosa dibungkus
 `<span lang="zh-Hant">`.
@@ -165,7 +201,7 @@ Experience:
 - 2026–sekarang · Backend Developer & Scrum Master · BudgEx — Product-Based Learning (PdBL) project, PENS in
   collaboration with PT Sinergi Dimensi Informatika (Sindika). BudgEx adalah NAMA PROYEK PdBL kampus, BUKAN perusahaan,
   dan ini BUKAN pekerjaan atau magang di Sindika (jangan menyiratkan karyawan Sindika di hero, About, Now, Experience,
-  data, meta, atau JSON-LD). Periode "2026 to now" belum dikonfirmasi pemilik (jangan diubah dulu). Tampil sebagai butir di daftar Experience (`points` di
+  data, meta, atau JSON-LD). Periode "2026 – Present" belum dikonfirmasi pemilik (jangan diubah dulu). Tampil sebagai butir di daftar Experience (`points` di
   `src/data/experience.ts`): aturan pengajuan anggaran (satu RAB aktif, pengajuan baru saat review, kedaluwarsa otomatis
   setelah disetujui), validasi OPEX dan metadata review CAPEX dengan unit test, endpoint laporan (variance anggaran,
   ringkasan direksi, drill-down kepala departemen) dan sistem peringatan pemakaian anggaran, serta dashboard realisasi
@@ -220,7 +256,7 @@ Angka dampak lama ("efisiensi naik 40%", "50% lebih cepat", dll.) hanya dipakai 
 
 Credentials:
 - Becoming a Software Engineer in the Age of AI — GDG on Campus ITS · 2025
-- Panitia PKKMB x Technogear 2025 — BEM PENS · 2025
+- Committee Member, PKKMB x Technogear 2025 — BEM PENS · 2025
 - Life Management Training PENS 2025 — Sinergi97 · 2025
 - AWS Academy Graduate – Cloud Foundations — AWS · 2026
 
@@ -234,21 +270,30 @@ Kontak: rindangtulus@gmail.com · LinkedIn `rindangtulus` · GitHub `rindangtulu
        beranda satu halaman (Work, About, Experience + Credentials, Now, Contact). Isi konten awal sudah terpasang;
        teks yang belum terkonfirmasi ditandai TODO(rindang)
 2. [x] Beranda lengkap (dibangun di 1b; data BudgEx diperbarui di langkah 3). TODO(rindang) tersisa: tanggung jawab Scrum
-       Master (selesai), apa yang sedang dipelajari di Now, tahun proyek, framework/bahasa backend BudgEx;
-       periode BudgEx dan blok Now menunggu konfirmasi pemilik
+       Master (selesai), blok Now (selesai), tahun proyek, framework/bahasa backend BudgEx;
+       periode BudgEx menunggu konfirmasi pemilik
 3. [x] Content Collection `projects` + halaman studi kasus (Rain Mandarin pertama, galeri screenshot) + View Transitions
        + data BudgEx baru + `npm run check:links`
 4. [x] SEO (meta, Open Graph, sitemap, JSON-LD), OG per studi kasus, favicon RT, 404, sakelar tema
-5. [ ] Audit akhir: aksesibilitas, Lighthouse, tampilan HP, isi konten
+5. [x] Audit akhir: konten (ekstraksi teks, ejaan Amerika), aksesibilitas (keyboard, `inert` pada menu HP, zoom/reflow, forced-colors),
+       teknis (README, .nvmrc, workflow dengan job verify, bersih-bersih aset), Lighthouse. Menunggu: merge ke main (dikerjakan pemilik).
+       TODO(rindang) tersisa: tahun proyek, framework/bahasa backend BudgEx; periode BudgEx
+       menunggu konfirmasi pemilik. Belum bisa diperbarui sampai Node lokal >= 22.23.4: `astro` 7.3.8 -> >= 7.4.7 (audit moderate)
 
 Tandai item dengan [x] setiap kali selesai.
 
 ## Perintah
+- Prosedur: hentikan `npm run dev` sebelum menjalankan `npm run build`, `npm run check`, atau `npm run shots`. Semuanya memakai
+  folder cache konten yang sama (`.astro/` dan `node_modules/.astro/`), dan `shots` gagal ("Preview server tidak siap") bila
+  ada `astro preview` lain yang sedang berjalan. Bila daftar proyek tampak kosong atau studi kasus 404 di dev: hentikan dev,
+  hapus `.astro` dan `node_modules/.astro`, lalu jalankan ulang; di Chrome periksa juga service worker lama pada `localhost:4321`
+  (DevTools, Application, Clear site data) atau buka jendela penyamaran.
 - `npm run dev` — server pengembangan
 - `npm run build` — build statis ke `dist/`
 - `npm run preview` — pratinjau hasil build
 - `npm run check` — pemeriksaan tipe Astro/TypeScript (`astro check`)
-- `npm run check:links` — periksa `dist/`: tautan/aset internal, canonical, og:image, sitemap, robots, 404 (setelah build)
+- `npm run check:links` — periksa `dist/`: tautan/aset internal, canonical, og:image, sitemap, robots, 404, dan kebersihan
+  (tanpa TODO/lorem/placeholder/localhost/console.log/href kosong; chunk vendor Astro dikecualikan) (setelah build)
 - `npm run og` — buat ulang gambar OG (`public/og.png`, `public/og/<slug>.png`)
 - `npm run icons` — render PNG favicon (32 px) dan apple-touch-icon (180 px) dari `public/favicon.svg`
 - `npm run shots` — screenshot beranda dan studi kasus di 360/390/768/1440 px, terang dan gelap, ke `.screenshots/`

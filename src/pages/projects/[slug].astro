@@ -18,6 +18,7 @@ export async function getStaticPaths() {
 
 const { entry } = Astro.props;
 const { Content } = await render(entry);
+if (!entry.data.cover || !entry.data.coverAlt) throw new Error(`Case study "${entry.id}" needs cover and coverAlt.`);
 const { title, subtitle, code, year, role, stack, summary, version, links, cover, coverAlt, gallery } = entry.data;
 const slug = entry.id;
 const parts = subtitle.split(/([㐀-鿿]+)/).filter(Boolean);
@@ -29,10 +30,10 @@ const meta = [
 ---
 
 <Base
-  title={`${title}: case study | Rindang Tulus`}
+  title={`${title} case study | Rindang Tulus`}
   description={summary}
   image={`/og/${slug}.png`}
-  imageAlt={`${title}: case study by Rindang Tulus. ${summary}`}
+  imageAlt={`${code} · Case study. ${title}. ${summary} rindangtulus.github.io`}
   type="article"
 >
   <article id="top">

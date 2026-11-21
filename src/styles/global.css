@@ -335,3 +335,28 @@
 .js .theme-toggle { display: inline-flex; }
 .theme-toggle > span { display: flex; align-items: center; justify-content: center; }
 .theme-toggle > span[hidden] { display: none; }
+
+/* ---------- Teks sangat besar (zoom teks 200-400%) ----------
+   Kata panjang tidak boleh membuat halaman bergulir horizontal: boleh dipatahkan bila memang tidak muat.
+   `anywhere` (bukan break-word) agar ukuran min-content kolom grid/flex ikut mengecil. Properti ini diwariskan. */
+body { overflow-wrap: anywhere; }
+
+/* ---------- Mode kontras tinggi (Windows forced-colors) ----------
+   Latar dan bayangan dibuang oleh browser: penanda yang hanya berupa warna latar harus punya
+   pengganti yang tetap terlihat. */
+@media (forced-colors: active) {
+  /* Item aktif pada pil/menu: garis tepi + garis bawah (aria-current tetap menjadi sumber kebenaran) */
+  [data-spy][aria-current='location'] {
+    outline: 2px solid CanvasText;
+    outline-offset: -2px;
+    text-decoration: underline;
+    text-underline-offset: 4px;
+  }
+  /* Titik status: pakai warna sistem agar tidak hilang */
+  .status-dot {
+    forced-color-adjust: none;
+    background-color: LinkText;
+  }
+  /* Tombol sakelar tema: beri batas agar terlihat sebagai kontrol */
+  .theme-toggle { border: 1px solid ButtonText; }
+}

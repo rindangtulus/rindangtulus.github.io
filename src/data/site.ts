@@ -15,7 +15,7 @@ export const site = {
   about: [
     'Hi, I am Rindang, a third-year Informatics student at Politeknik Elektronika Negeri Surabaya (PENS), interested in where technology, people and process meet.',
     'As Project Manager at E-Code, I lead cross-functional teams that plan and ship technology projects within the campus ecosystem. Good project management is about more than timelines: it creates clarity and momentum for everyone involved.',
-    'I am also Scrum Master and backend developer on BudgEx, a Product-Based Learning (PdBL) project at PENS in collaboration with PT Sinergi Dimensi Informatika (Sindika), a member of the Development Division at UKM Dirgantara, and I was Master of Ceremony at PKKMB x Technogear 2025, setting the tone for hundreds of new students entering tech education.',
+    'I am also Scrum Master and backend developer on BudgEx, a Product-Based Learning (PdBL) project at PENS in collaboration with PT Sinergi Dimensi Informatika (Sindika). I am a member of the Development Division at UKM Dirgantara, and I was Master of Ceremony at PKKMB x Technogear 2025, setting the tone for hundreds of new students entering tech education.',
   ],
   // TODO(rindang): tinjau kalimat penutup kontak.
   contactLine:

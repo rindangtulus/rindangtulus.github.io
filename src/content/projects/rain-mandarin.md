@@ -3,7 +3,7 @@ title: Rain Mandarin
 subtitle: 學華語 · Belajar Mandarin Taiwan
 code: P-01
 order: 1
-role: Product owner, designer & solo developer
+role: Product Owner, Designer & Solo Developer
 stack: [Dexie, Vitest, PWA, Claude Code]
 # Dikonfirmasi 2026-11-21: `npx vitest run` = 1046 tes lulus di 44 berkas. Di situs tetap "1,000+".
 summary: A 7-section, offline-capable PWA for Traditional-character Mandarin, backed by 1,000+ Vitest tests.
@@ -21,8 +21,8 @@ gallery:
     alt: Vocabulary list of ten words with pinyin, meanings and learning-status tags, above search, sort and tag controls
     caption: Vocabulary list with search, filters, and a status for every word, from not yet learned to mastered.
   - image: ../../assets/projects/belajar-mandarin/laptop-menulis.png
-    alt: Writing practice grid of sixteen characters with status dots, a practise button, and an empty stroke-order panel
-    caption: Writing. Pick a character, see its stroke order, then practise.
+    alt: Writing practice grid of sixteen characters with status dots, a practice button, and an empty stroke-order panel
+    caption: Writing. Pick a character, see its stroke order, then practice.
   - image: ../../assets/projects/belajar-mandarin/laptop-tata-bahasa.png
     alt: Grammar page with three sentence-pattern cards, each with an example, translation, explanation and status
     caption: Grammar patterns such as subject + 想 + verb + object, with examples and practice progress.
@@ -46,7 +46,7 @@ I was a beginner student in a Taiwanese Mandarin class, learning Traditional cha
 
 ## Problem
 
-I needed one place to keep the vocabulary from class, review it on a proper schedule, practise writing, and cover grammar, numbers and time, and tones.
+I needed one place to keep the vocabulary from class, review it on a proper schedule, practice writing, and cover grammar, numbers and time, and tones.
 
 ## My role
 
@@ -58,7 +58,7 @@ I worked from a seven-step roadmap with a branch per feature, Conventional Commi
 
 ## Outcome
 
-The app has seven study sections (Vocabulary, SRS cards, Writing, Grammar, Numbers & Time, Tones and Home), 1,000+ Vitest tests, an installable PWA that works offline, and a deployment on Vercel.
+The app has seven study sections (Vocabulary, SRS cards, Writing, Grammar, Numbers and Time, Tones, and Home), 1,000+ Vitest tests, an installable PWA that works offline, and a deployment on Vercel.
 
 ## What I learned
 
@@ -69,6 +69,6 @@ I learned how to design local-first data, keep old backups readable, write clear
 - SM-2 scheduling with a learning phase and an Undo action.
 - 3D flip cards with swipe gestures.
 - An activity registry that feeds streaks and the heatmap.
-- Mandarin rules modelled in code: <span lang="zh-Hant">萬</span>/<span lang="zh-Hant">億</span> number grouping, <span lang="zh-Hant">零</span> and <span lang="zh-Hant">兩</span> usage, <span lang="zh-Hant">一</span>/<span lang="zh-Hant">不</span> tone sandhi, and a filter for third-tone pairs (3-3).
+- Mandarin rules modeled in code: <span lang="zh-Hant">萬</span>/<span lang="zh-Hant">億</span> number grouping, <span lang="zh-Hant">零</span> and <span lang="zh-Hant">兩</span> usage, <span lang="zh-Hant">一</span>/<span lang="zh-Hant">不</span> tone sandhi, and a filter for third-tone pairs (3-3).
 - A pinyin mode for beginners.
 - Accessibility and reduced-motion support.
