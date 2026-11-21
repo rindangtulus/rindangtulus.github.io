@@ -1,0 +1,49 @@
+---
+import { site } from '../data/site';
+import Icon from './Icon.astro';
+
+// Satu frasa aksen (Gloock miring, warna accent). Setiap kata dibungkus mask sendiri supaya
+// reveal tetap rapi di lebar berapa pun (pemenggalan baris ditentukan browser).
+const lead = 'I lead small teams to ship software'.split(' ');
+const accent = 'that works.'.split(' ');
+const roleLine = 'IT project manager and Scrum Master who also builds the backend.';
+---
+
+<section id="top" class="pb-16 pt-32 md:pt-44 lg:pb-32 lg:pt-52" aria-labelledby="hero-title">
+  <div class="container-page">
+    <h1 id="hero-title" class="title-hero max-w-[11em]">
+      {
+        lead.map((w, i) => (
+          <>
+            <span class="mask-word"><span style={`--i:${i}`}>{w}</span></span>{' '}
+          </>
+        ))
+      }<em>
+        {
+          accent.map((w, i) => (
+            <>
+              <span class="mask-word"><span style={`--i:${lead.length + i}`}>{w}</span></span>{i < accent.length - 1 ? ' ' : ''}
+            </>
+          ))
+        }
+      </em>
+    </h1>
+
+    <!-- Menjorok ke kolom kanan dari tablet ke atas -->
+    <div class="mt-12 md:ml-[25%] md:mt-16 lg:ml-[50%]">
+      <p class="stagger-item max-w-[30ch] text-xl leading-snug tracking-[-0.015em] text-ink sm:text-2xl" style="--i:8">
+        {roleLine}
+      </p>
+      <p class="stagger-item mt-1 max-w-[30ch] text-xl leading-snug tracking-[-0.015em] text-muted sm:text-2xl" style="--i:9">
+        Based in Surabaya.
+      </p>
+      <p class="stagger-item mt-8" style="--i:10">
+        <a href="/#contact" class="link group inline-flex min-h-11 items-center gap-2.5 text-base font-medium">
+          <span class="status-dot size-2 shrink-0 rounded-full bg-accent" aria-hidden="true"></span>
+          {site.status}
+          <Icon name="arrow-right" class="size-4 transition-transform duration-300 group-hover:translate-x-1" />
+        </a>
+      </p>
+    </div>
+  </div>
+</section>

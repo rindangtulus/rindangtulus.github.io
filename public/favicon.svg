@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <!-- Monogram RT (bentuk geometris, tanpa font). Hex di sini adalah PENGECUALIAN yang disengaja:
+       SVG tidak bisa membaca token CSS situs. Terang = wine/paper, gelap = rose/plum (Claret Folio). -->
+  <style>
+    .bg { fill: #7c0e44; }
+    .fg { stroke: #fbf5f2; }
+    @media (prefers-color-scheme: dark) {
+      .bg { fill: #d49a9a; }
+      .fg { stroke: #1a0b13; }
+    }
+  </style>
+  <rect class="bg" width="32" height="32" rx="7" />
+  <g class="fg" fill="none" stroke-width="3.2" stroke-linejoin="miter">
+    <path d="M7 25V7.5h4.4a4.2 4.2 0 0 1 0 8.4H7M11.2 16 15 25" />
+    <path d="M17 7.5h11M22.5 7.5V25" />
+  </g>
+</svg>

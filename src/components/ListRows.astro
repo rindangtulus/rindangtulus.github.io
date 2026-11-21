@@ -1,0 +1,34 @@
+---
+// Daftar bersih: periode | judul + keterangan (+ butir opsional). Dipakai Experience dan Credentials.
+interface Item {
+  when: string;
+  title: string;
+  sub: string;
+  points?: string[];
+}
+interface Props {
+  items: Item[];
+}
+const { items } = Astro.props;
+---
+
+<ul class="border-t border-line">
+  {
+    items.map((it) => (
+      <li class="grid gap-1.5 border-b border-line py-6 md:grid-cols-[12rem_1fr] md:gap-8 md:py-7">
+        <p class="label md:pt-1.5">{it.when}</p>
+        <div>
+          <p class="text-xl font-medium leading-snug tracking-[-0.015em] text-ink md:text-2xl">{it.title}</p>
+          <p class="mt-0.5 text-base text-muted">{it.sub}</p>
+          {it.points && it.points.length > 0 && (
+            <ul class="mt-4 max-w-[62ch] space-y-2 text-base text-ink">
+              {it.points.map((p) => (
+                <li class="relative pl-5 before:absolute before:left-0 before:top-[0.8em] before:h-px before:w-3 before:bg-muted">{p}</li>
+              ))}
+            </ul>
+          )}
+        </div>
+      </li>
+    ))
+  }
+</ul>

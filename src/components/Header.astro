@@ -1,0 +1,122 @@
+---
+import { sections } from '../data/nav';
+import { site } from '../data/site';
+import Icon from './Icon.astro';
+import ThemeToggle from './ThemeToggle.astro';
+
+const social = [
+  { label: 'LinkedIn', icon: 'linkedin', href: site.linkedin },
+  { label: 'GitHub', icon: 'github', href: site.github },
+] as const;
+---
+
+<!-- Bar atas ikut scroll (tidak menempel). Hanya pil nav (dan tombol Menu di HP) yang menempel. -->
+<header class="absolute inset-x-0 top-0 z-30">
+  <div class="container-page flex min-h-[76px] items-center justify-between gap-6 py-2 max-md:pr-[min(8.5rem,70vw)]">
+    <a href="/" class="flex min-h-11 min-w-0 flex-col justify-center leading-tight">
+      <span class="text-base font-medium tracking-tight">Rindang Tulus</span>
+      <span class="text-[0.8125rem] text-muted">IT Project Manager</span>
+    </a>
+
+    <!-- Tablet ke atas: ikon (768-1023), teks + panah (>= 1024). aria-label wajib, area ketuk >= 44 px. -->
+    <ul class="hidden items-center gap-1 md:flex">
+      {
+        social.map((s) => (
+          <li>
+            <a
+              href={s.href}
+              rel="me noopener"
+              target="_blank"
+              aria-label={`${s.label} (opens in a new tab)`}
+              class="social-link group inline-flex min-h-11 min-w-11 items-center justify-center gap-1.5 rounded-full px-2 text-base font-medium text-ink transition-colors hover:text-accent"
+            >
+              <span class="inline-flex lg:hidden"><Icon name={s.icon} class="size-5" /></span>
+              <span class="hidden lg:inline">{s.label}</span>
+              <span class="hidden lg:inline-flex"><Icon name="arrow-up-right" class="size-4 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" /></span>
+            </a>
+          </li>
+        ))
+      }
+      <li><ThemeToggle /></li>
+    </ul>
+  </div>
+</header>
+
+<!-- Pil melayang di tengah atas (>= 768 px) -->
+<nav
+  transition:persist="site-pill"
+  class="fixed left-1/2 top-3 z-40 hidden -translate-x-1/2 rounded-full border border-line bg-surface/85 p-1 shadow-pill backdrop-blur-md md:block"
+  aria-label="Sections"
+>
+  <ul class="flex items-center gap-0.5">
+    {
+      sections.map((s) => (
+        <li>
+          <a
+            href={`/#${s.id}`}
+            data-spy={s.id}
+            class="flex min-h-11 items-center rounded-full px-4 text-[0.9375rem] font-medium text-muted transition-colors hover:text-ink aria-[current=location]:bg-line aria-[current=location]:text-ink"
+          >
+            {s.label}
+          </a>
+        </li>
+      ))
+    }
+  </ul>
+</nav>
+
+<!-- HP (< 768 px): tombol Menu menempel di kanan atas; details = berfungsi tanpa JS -->
+<details data-menu class="md:hidden">
+  <summary
+    class="fixed right-5 top-4 z-50 flex min-h-11 cursor-pointer list-none items-center rounded-full border border-line bg-surface/85 px-4 text-base font-medium shadow-pill backdrop-blur-md [&::-webkit-details-marker]:hidden"
+    aria-expanded="false"
+  >
+    <span class="menu-open inline-flex items-center gap-2">Menu <Icon name="menu" class="size-5" /></span>
+    <span class="menu-close hidden items-center gap-2">Close <Icon name="x" class="size-5" /></span>
+  </summary>
+  <nav class="menu-panel fixed inset-0 z-40 overflow-y-auto bg-paper px-5 pb-10 pt-28" aria-label="Sections, mobile">
+    <ul>
+      {
+        sections.map((s) => (
+          <li class="border-b border-line">
+            <a
+              href={`/#${s.id}`}
+              data-spy={s.id}
+              class="flex min-h-16 items-center text-[2.25rem] font-medium leading-none tracking-[-0.035em] text-muted aria-[current=location]:text-ink"
+            >
+              {s.label}
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+    <ul class="mt-8 flex flex-wrap gap-x-6">
+      {
+        social.map((s) => (
+          <li>
+            <a
+              href={s.href}
+              rel="me noopener"
+              target="_blank"
+              class="inline-flex min-h-11 items-center gap-1.5 text-base font-medium text-ink"
+            >
+              {s.label}
+              <Icon name="arrow-up-right" class="size-4" />
+              <span class="sr-only">(opens in a new tab)</span>
+            </a>
+          </li>
+        ))
+      }
+      <li><ThemeToggle class="-ml-2" /></li>
+    </ul>
+  </nav>
+</details>
+
+<style>
+  details[open] .menu-open {
+    display: none;
+  }
+  details[open] .menu-close {
+    display: inline-flex;
+  }
+</style>

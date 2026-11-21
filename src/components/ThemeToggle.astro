@@ -1,0 +1,20 @@
+---
+// Sakelar tema dua keadaan. Hanya tampil bila JavaScript berjalan (.js); tanpa JS tema mengikuti sistem.
+// Ikon dan aria-label diatur oleh src/scripts/theme.ts: bulan di tema terang, matahari di tema gelap.
+import Icon from './Icon.astro';
+
+interface Props {
+  class?: string;
+}
+const { class: className = '' } = Astro.props;
+---
+
+<button
+  type="button"
+  data-theme-toggle
+  aria-label="Switch to dark theme"
+  class:list={['theme-toggle size-11 items-center justify-center rounded-full text-ink transition-colors hover:bg-line', className]}
+>
+  <span data-theme-icon="moon" hidden><Icon name="moon" class="size-5" /></span>
+  <span data-theme-icon="sun" hidden><Icon name="sun" class="size-5" /></span>
+</button>

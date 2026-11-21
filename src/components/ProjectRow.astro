@@ -1,0 +1,51 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import Icon from './Icon.astro';
+
+interface Props {
+  project: CollectionEntry<'projects'>;
+}
+const { project } = Astro.props;
+const { code, title, subtitle, role, stack, caseStudy } = project.data;
+const slug = project.id;
+// Aksara Han diberi lang="zh-Hant" agar memakai glif tradisional yang benar.
+const parts = subtitle.split(/([㐀-鿿]+)/).filter(Boolean);
+const stackText = stack.slice(0, 3).join(' · ');
+
+// Hanya studi kasus yang berupa tautan; proyek lain baris biasa (tanpa panah dan tanpa hover).
+const Tag = caseStudy ? 'a' : 'div';
+const base =
+  'group grid grid-cols-[1fr_auto] items-center gap-x-6 gap-y-3 border-b border-line py-7 md:grid-cols-[3.5rem_1fr_minmax(0,22rem)_auto] md:gap-x-8 md:py-9';
+const interactive = 'transition-colors duration-300 hover:border-accent focus-visible:border-accent';
+---
+
+<Tag href={caseStudy ? `/projects/${slug}` : undefined} class:list={[base, caseStudy && interactive]}>
+  <span class="label hidden md:block">{code}</span>
+  <span class="min-w-0">
+    <span
+      class="block text-2xl font-medium leading-tight tracking-[-0.02em] text-ink"
+      transition:name={`title-${slug}`}>{title}</span
+    >
+    <span class="mt-1 block text-base text-muted">
+      {parts.map((p) => (/[㐀-鿿]/.test(p) ? <span lang="zh-Hant">{p}</span> : p))}
+    </span>
+  </span>
+  <span class="label order-last col-span-1 col-start-1 row-start-2 md:order-none md:col-start-auto md:row-start-auto">
+    <span class="block">{role}</span><span class="block">{stackText}</span>
+  </span>
+  <span
+    class:list={[
+      'col-start-2 row-span-2 row-start-1 flex size-[min(2.75rem,max(44px,12vw))] items-center justify-center text-ink md:col-start-auto md:row-span-1 md:row-start-auto md:size-11',
+      !caseStudy && 'max-md:hidden',
+    ]}
+  >
+    {
+      caseStudy && (
+        <Icon
+          name="arrow-right"
+          class="size-6 transition-[transform,color] duration-300 group-hover:translate-x-1 group-hover:text-accent group-focus-visible:translate-x-1 group-focus-visible:text-accent"
+        />
+      )
+    }
+  </span>
+</Tag>
