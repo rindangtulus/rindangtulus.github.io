@@ -1,0 +1,59 @@
+---
+import '../styles/global.css';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import { site } from '../data/site';
+// Preload woff2 latin (URL yang sama dengan yang dipakai @font-face, jadi tidak diunduh dua kali).
+import sansUrl from '@fontsource-variable/inter-tight/files/inter-tight-latin-wght-normal.woff2?url';
+import accentUrl from '@fontsource/gloock/files/gloock-latin-400-normal.woff2?url';
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+const {
+  title = `${site.name}: IT Project Manager & Backend Developer`,
+  description = site.positioning,
+} = Astro.props;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="light dark" />
+    {/* theme-color: harus sama dengan --paper di src/styles/global.css (terang, gelap) */}
+    <meta name="theme-color" content="#FBF5F2" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#1A0B13" media="(prefers-color-scheme: dark)" />
+    <link rel="preload" href={sansUrl} as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href={accentUrl} as="font" type="font/woff2" crossorigin />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="icon" type="image/png" href="/favicon.png" />
+    <script is:inline>
+      document.documentElement.classList.add('js');
+    </script>
+  </head>
+  <body>
+    <a
+      href="#main"
+      class="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-full focus:bg-ink focus:px-4 focus:py-3 focus:text-paper"
+    >
+      Skip to content
+    </a>
+    <Header />
+    <main id="main">
+      <slot />
+    </main>
+    <Footer />
+    <script>
+      import { initReveal } from '../scripts/reveal';
+      import { initScrollSpy } from '../scripts/scrollspy';
+      import { initMenu } from '../scripts/menu';
+      initReveal();
+      initScrollSpy();
+      initMenu();
+    </script>
+  </body>
+</html>

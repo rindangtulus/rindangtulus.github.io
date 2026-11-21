@@ -1,0 +1,271 @@
+@import 'tailwindcss';
+@import '@fontsource-variable/inter-tight';
+@import '@fontsource/gloock';
+
+/* ---------- Token tema "Claret Folio" · palet Claret ----------
+   SATU-SATUNYA tempat hex warna. Komponen hanya memakai token ini.
+   Pengecualian (tidak bisa memakai variabel CSS): <meta name="theme-color">
+   di src/layouts/Base.astro dan favicon (langkah 4). Ubah di sini = ubah di sana. */
+:root {
+  --paper: #fbf5f2;
+  --surface: #ffffff;
+  --ink: #231019;
+  --muted: #6e5560;
+  --line: #f2dace;
+  --accent: #7c0e44;
+  --accent-hover: #5e0b35;
+  --accent-soft: #aa5e7a; /* ornamen, BUKAN untuk teks kecil */
+  --on-accent: #ffffff;
+  --selection: #d49a9a;
+  --selection-text: #231019;
+  --shadow-color: #231019; /* plum gelap; jangan diturunkan dari --ink (di gelap ink terang) */
+  color-scheme: light;
+}
+/* Ikuti preferensi sistem; sakelar manual (data-theme) menyusul di langkah 4. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --paper: #1a0b13;
+    --surface: #26121d;
+    --ink: #f2dace;
+    --muted: #b8979f;
+    --line: #3a1f2d;
+    --accent: #d49a9a;
+    --accent-hover: #e3b3b3;
+    --accent-soft: #aa5e7a;
+    --on-accent: #1a0b13;
+    --selection: #d49a9a;
+    --selection-text: #1a0b13;
+    --shadow-color: #0a0409; /* hampir hitam bernuansa plum */
+    color-scheme: dark;
+  }
+}
+:root[data-theme='dark'] {
+  --paper: #1a0b13;
+  --surface: #26121d;
+  --ink: #f2dace;
+  --muted: #b8979f;
+  --line: #3a1f2d;
+  --accent: #d49a9a;
+  --accent-hover: #e3b3b3;
+  --accent-soft: #aa5e7a;
+  --on-accent: #1a0b13;
+  --selection: #d49a9a;
+  --selection-text: #1a0b13;
+  --shadow-color: #0a0409;
+  color-scheme: dark;
+}
+
+/* ---------- Font ----------
+   Metrik fallback (size-adjust, ascent/descent-override) dihitung dari tabel hhea font
+   dan lebar rata-rata teks sampel, supaya tidak ada pergeseran tata letak saat font tiba.
+   Inter Tight: asc 0.96875, desc 0.2412, lebar 91,57% dari Arial.
+   Gloock: asc 0.975, desc 0.225, lebar 88,8% dari Georgia (italic). */
+@font-face {
+  font-family: 'Inter Tight Fallback';
+  src: local('Arial'), local('Helvetica'), local('Liberation Sans');
+  size-adjust: 91.57%;
+  ascent-override: 105.8%;
+  descent-override: 26.3%;
+  line-gap-override: 0%;
+}
+@font-face {
+  font-family: 'Gloock Fallback';
+  src: local('Georgia Italic'), local('Georgia');
+  font-style: italic;
+  size-adjust: 88.8%;
+  ascent-override: 109.8%;
+  descent-override: 25.3%;
+  line-gap-override: 0%;
+}
+
+@theme inline {
+  --color-paper: var(--paper);
+  --color-surface: var(--surface);
+  --color-ink: var(--ink);
+  --color-muted: var(--muted);
+  --color-line: var(--line);
+  --color-accent: var(--accent);
+  --color-accent-hover: var(--accent-hover);
+  --color-accent-soft: var(--accent-soft);
+  --color-on-accent: var(--on-accent);
+  --shadow-panel: 0 24px 40px -24px color-mix(in oklab, var(--shadow-color) 40%, transparent);
+  --shadow-pill: 0 10px 30px -14px color-mix(in oklab, var(--shadow-color) 45%, transparent);
+  /* Font Han (aksara tradisional) lewat fallback sistem; tidak ada unduhan CJK. */
+  --font-sans: 'Inter Tight Variable', 'Inter Tight Fallback', system-ui, 'PingFang TC', 'Microsoft JhengHei',
+    'Noto Sans TC', sans-serif;
+  --font-accent: 'Gloock', 'Gloock Fallback', Georgia, 'Times New Roman', serif;
+  --ease-soft: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    /* Pil menempel setinggi sekitar 64 px: target anchor dan elemen fokus tidak boleh tertutup. */
+    scroll-padding-top: 6.5rem;
+    -webkit-text-size-adjust: 100%;
+  }
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--font-sans);
+    font-size: 1rem;
+    line-height: 1.6;
+    letter-spacing: -0.005em;
+    overflow-x: clip;
+  }
+  ::selection {
+    background: var(--selection);
+    color: var(--selection-text);
+  }
+  /* Offset >= 2px agar cincin tetap terlihat pada tombol berlatar aksen. */
+  :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+  }
+  /* Jangan matikan font-synthesis: Gloock hanya punya 400 normal, italic sintetis diterima. */
+  em {
+    font-family: var(--font-accent);
+    font-style: italic;
+    font-weight: 400;
+  }
+}
+
+/* ---------- Komponen kecil yang dipakai ulang ---------- */
+@layer components {
+  .container-page {
+    width: 100%;
+    max-width: 1240px;
+    margin-inline: auto;
+    padding-inline: 1.25rem;
+  }
+  @media (min-width: 640px) {
+    .container-page { padding-inline: 2rem; }
+  }
+  @media (min-width: 1024px) {
+    .container-page { padding-inline: 2.5rem; }
+  }
+
+  /* Label kecil: sans huruf kapital berjarak */
+  .label {
+    font-size: 0.75rem;
+    font-weight: 500;
+    line-height: 1.4;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  @media (max-width: 639px) {
+    .label { font-size: 0.8125rem; }
+  }
+
+  /* Hero: grotesk besar dan rapat; hierarki lewat ukuran */
+  .title-hero {
+    font-size: clamp(2.5rem, 8.4vw, 6.5rem);
+    font-weight: 500;
+    letter-spacing: -0.045em;
+    line-height: 1.02;
+    text-wrap: balance;
+  }
+  .title-hero em { letter-spacing: -0.02em; color: var(--accent); }
+
+  .title-section {
+    font-size: clamp(2rem, 4.6vw, 3.5rem);
+    font-weight: 500;
+    letter-spacing: -0.035em;
+    line-height: 1;
+  }
+
+  .link {
+    color: var(--accent);
+    text-decoration: underline;
+    text-decoration-color: currentColor;
+    text-decoration-thickness: 1.5px;
+    text-underline-offset: 4px;
+    transition: color 0.2s, text-decoration-thickness 0.2s;
+  }
+  .link:hover { color: var(--accent-hover); text-decoration-thickness: 3px; }
+
+  /* Tombol garis berbentuk pil (aksi sekunder, mis. salin alamat) */
+  .btn-outline {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    min-height: 2.75rem;
+    padding: 0.5rem 1.25rem;
+    border: 1px solid var(--ink);
+    border-radius: 999px;
+    font-size: 1rem;
+    font-weight: 500;
+    color: var(--ink);
+    background: transparent;
+    cursor: pointer;
+    transition: background-color 0.25s var(--ease-soft), color 0.25s var(--ease-soft);
+  }
+  .btn-outline:hover { background: var(--ink); color: var(--paper); }
+}
+
+/* ---------- Sistem animasi ---------- */
+/* 1) Hero: kata naik dari balik mask. Murni CSS, konten tetap terlihat tanpa JS.
+   Padding + margin negatif memberi ruang untuk descender ("p") dan overhang italic Gloock
+   tanpa mengubah tata letak. */
+.mask-word {
+  display: inline-block;
+  overflow: clip;
+  padding: 0.14em 0.12em 0.2em;
+  margin: -0.14em -0.12em -0.2em;
+  vertical-align: top;
+}
+.mask-word > span {
+  display: inline-block;
+  animation: rise 0.8s var(--ease-soft) both;
+  animation-delay: calc(var(--i, 0) * 70ms + 100ms);
+}
+@keyframes rise {
+  from { transform: translateY(112%); }
+  to { transform: none; }
+}
+
+/* 2) Stagger: .stagger-item muncul berurutan lewat variabel --i */
+.stagger-item {
+  animation: fade-up 0.6s var(--ease-soft) both;
+  animation-delay: calc(var(--i, 0) * 90ms + 350ms);
+}
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: none; }
+}
+
+/* 3) Reveal saat scroll: hanya aktif bila JS berjalan (kelas .js di <html>) */
+.js [data-reveal] {
+  opacity: 0;
+  transform: translateY(14px);
+  transition:
+    opacity 0.6s var(--ease-soft),
+    transform 0.6s var(--ease-soft);
+  transition-delay: calc(var(--i, 0) * 80ms);
+}
+.js [data-reveal].is-visible {
+  opacity: 1;
+  transform: none;
+}
+
+/* Panel menu mobile */
+.menu-panel { animation: fade-in 0.25s var(--ease-soft) both; }
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(-6px); }
+  to { opacity: 1; transform: none; }
+}
+
+/* 4) Reduced motion: matikan semua gerak, konten langsung tampil */
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-delay: 0ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    transition-delay: 0ms !important;
+  }
+  .js [data-reveal] { opacity: 1; transform: none; }
+}
